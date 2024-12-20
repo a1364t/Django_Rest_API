@@ -33,6 +33,10 @@ class Customer(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)
 
+class UnpaidOrdermanager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Order.ORDER_STATUS_UNPAID)
+
 class Order(models.Model):
     ORDER_STATUS_PAID = 'p'
     ORDER_STATUS_UNPAID = 'u'
@@ -46,6 +50,9 @@ class Order(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS_UNPAID)
 
+    objects = models.Manager()
+    unpaid_orders = UnpaidOrdermanager()
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_items')
@@ -55,6 +62,17 @@ class OrderItem(models.Model):
     # make sure one record is for each order
     class Meta:
         unique_together = [['order', 'product']]
+
+class CommentManager(models.Manager):
+    def get_approved(self):
+        return self.get_queryset().filter(status=Comment.COMMENT_STATUS_APPROVED)
+    
+
+class ApprovedCommentManager(models.Model):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Comment.COMMENT_STATUS_APPROVED)
+
+
 
 class Comment(models.Model):
     COMMENT_STATUS_WAITING = 'w'
@@ -71,6 +89,9 @@ class Comment(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=COMMENT_STATUS, default=COMMENT_STATUS_WAITING)
 
+    objects = CommentManager()
+    approved = ApprovedCommentManager()
+
 
 class Address(models.Model):
     customer = models.OneToOneField(Customer, on_delete=models.CASCADE, primary_key=True)
@@ -78,6 +99,8 @@ class Address(models.Model):
     city = models.CharField(max_length=255)
     street = models.CharField(max_length=255)
     number = models.PositiveIntegerField()
+
+
 
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
