@@ -6,9 +6,9 @@ class Category(models.Model):
     description = models.CharField(max_length=500, blank=True)
     top_product = models.ForeignKey('Product', on_delete=models.SET_NULL, blank=True, null=True, related_name='+') #don't make a reverse relationship
 
-
     def __str__(self):
-        return f'{self.id}.{self.title}'
+        return self.title
+
 
 class Discount(models.Model):
     discount = models.FloatField()
@@ -45,9 +45,11 @@ class Customer(models.Model):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+
 class UnpaidOrdermanager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(status=Order.ORDER_STATUS_UNPAID)
+
 
 class Order(models.Model):
     ORDER_STATUS_PAID = 'p'
@@ -68,16 +70,17 @@ class Order(models.Model):
     def __str__(self):
         return f'Order ID: {self.id}'
 
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_items')
     quantity = models.PositiveSmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
 
-     
-    # make sure one record is for each order
+     # make sure one record is for each order
     class Meta:
         unique_together = [['order', 'product']]
+
 
 class CommentManager(models.Manager):
     def get_approved(self):
@@ -87,7 +90,6 @@ class CommentManager(models.Manager):
 class ApprovedCommentManager(models.Model):
     def get_queryset(self):
         return super().get_queryset().filter(status=Comment.COMMENT_STATUS_APPROVED)
-
 
 
 class Comment(models.Model):
@@ -115,7 +117,6 @@ class Address(models.Model):
     city = models.CharField(max_length=255)
     street = models.CharField(max_length=255)
     number = models.PositiveIntegerField()
-
 
 
 class Cart(models.Model):
