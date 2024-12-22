@@ -7,17 +7,29 @@ from rest_framework import status
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
 
-@api_view()
+@api_view(['GET', 'POST'])
 def product_lis(request):
-    products_queryset = Product.objects.select_related('category').all()
-    serializer = ProductSerializer(products_queryset, many=True, context={'request': request})
-    return Response(serializer.data)
+    if request.method == 'GET':
+        products_queryset = Product.objects.select_related('category').all()
+        serializer = ProductSerializer(products_queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response('Everything is ok')
 
 @api_view()
 def product_detail(request, pk):
     product = get_object_or_404(Product.objects.select_related('category'), pk=pk)
     serializer= ProductSerializer(product, context={'request': request})
     return Response(serializer.data)
+    
+
+        # if serializer.is_valid():
+        #     serializer.validated_data
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view()
 def category_detail(request, pk):
