@@ -6,9 +6,15 @@ from django.utils.text import slugify
 from .models import Category, Product
 
 
-class CategorySerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=255)
-    description = serializers.CharField(max_length=500)
+class CategorySerializer(serializers.ModelSerializer):
+    num_of_products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ['id', 'title', 'description', 'num_of_products']
+
+    def get_num_of_products(self, categoty:Category):
+        return categoty.products.count()
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -34,6 +40,11 @@ class ProductSerializer(serializers.ModelSerializer):
         product.slug = slugify(product.name)
         product.save()
         return product
+    
+    # def update(self, instance, validated_data):
+    #     instance.inventory = validated_data.get('inventory')
+    #     instance.save()
+    #     return instance
  
 #     category = serializers.HyperlinkedRelatedField(
 #          queryset=Category.objects.all(),
