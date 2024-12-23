@@ -6,10 +6,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 
 from .paginations import DefaultPagination
-from .models import Category, Product, Comment
-from .serializers import CategorySerializer, CommentSerializer, ProductSerializer
+from .models import Cart, Category, Product, Comment
+from .serializers import CartSerializer, CategorySerializer, CommentSerializer, ProductSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
@@ -68,6 +70,13 @@ class CommentViewSet(ModelViewSet):
 
     def get_serializer_context(self): # send product_id or pk to serializer
          return {'product_pk': self.kwargs['product_pk']}
+    
+
+class CartViewSet(CreateModelMixin, # Remoce List, Update, Delete
+                  RetrieveModelMixin, 
+                  GenericViewSet):
+     serializer_class = CartSerializer
+     queryset = Cart.objects.all()
 
 
 ##################### Calss based View ###################################
