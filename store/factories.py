@@ -39,15 +39,32 @@ class ProductFactory(DjangoModelFactory):
     inventory = factory.LazyFunction(lambda: random.randint(1, 100))
 
 
+from django.contrib.auth import get_user_model
+from factory.django import DjangoModelFactory
+
+# User model
+User = get_user_model()
+
+class UserFactory(DjangoModelFactory):
+    class Meta:
+        model = User
+
+    username = factory.Faker("user_name")
+    email = factory.Faker("email")
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    password = factory.PostGenerationMethodCall('set_password', 'password')  # Default password
+
 class CustomerFactory(DjangoModelFactory):
     class Meta:
         model = models.Customer
 
-    first_name = factory.Faker("first_name")
-    last_name = factory.Faker("last_name")
-    email = factory.Faker("email")
+    user = factory.SubFactory(UserFactory)  # Link to a generated user
     phone_number = factory.Faker("phone_number")
-    birth_date = factory.LazyFunction(lambda: faker.date_time_ad(start_datetime=datetime(1990,1,1), end_datetime=datetime(2015,1,1)))
+    birth_date = factory.LazyFunction(
+        lambda: faker.date_time_ad(start_datetime=datetime(1990, 1, 1), end_datetime=datetime(2015, 1, 1))
+    )
+
 
 
 class AddressFactory(DjangoModelFactory):

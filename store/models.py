@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from uuid import uuid4
+from django.conf import settings
 
 class Category(models.Model):
     title = models.CharField(max_length=255)
@@ -35,9 +36,7 @@ class Product(models.Model):
 
 
 class Customer(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField()
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     phone_number = models.CharField(max_length=100)
     birth_date = models.DateField(null=True, blank=True)
     datetime_created = models.DateTimeField(auto_now_add=True)
@@ -45,6 +44,15 @@ class Customer(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+    
+    class Meta:
+        permissions = [
+            ('send_private_email', 'can send private email to the users')
+        ]
+
+    @property # custom model field
+    def full_name(self):
+        return f'{self.user.first_name}  {self.user.last_name}'
 
 
 class UnpaidOrdermanager(models.Manager):
