@@ -31,20 +31,58 @@ class CartProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'unit_price']
 
 
-class CartItemSerializer(serializers.ModelSerializer):
-    product = CartProductSerializer()
+class UpdateCartItemSerializer(serializers.ModelSerializer): # To change the quantity of a product
+    class Meta:
+        model = CartItem
+        fields = ['quantity']
+
+
+class AddCartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ['id', 'product', 'quantity']
 
+    def create(self, validated_data):
+        cart_id = self.context['cart_pk']
+
+        product = validated_data.get('product')
+        quantity = validated_data.get('quantity')
+
+        try:
+             #try to see if product exisit in the cartitem, add to it.
+            cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product.id)
+            cart_item.quantity += quantity
+            cart_item.save()
+        except CartItem.DoesNotExist:
+            CartItem.objects.create(cart_id=cart_id, **validated_data)
+
+        self.instance = cart_item
+        return cart_item
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = CartProductSerializer()
+    item_total = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', 'item_total']
+
+    def get_item_total(self, cart_item):
+        return cart_item.quantity * cart_item.product.unit_price
+
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
     # id = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = Cart
-        fields = ['id', 'items']
+        fields = ['id', 'items', 'total_price']
         read_only_fields = ['id']
+
+    def get_total_price(self, cart):
+        return sum([item.quantity * item.product.unit_price for item in cart.items.all()])
 
 
 class ProductSerializer(serializers.ModelSerializer):
