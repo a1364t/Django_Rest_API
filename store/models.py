@@ -35,6 +35,7 @@ class Product(models.Model):
         return self.name
 
 
+
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     phone_number = models.CharField(max_length=100)
@@ -43,7 +44,7 @@ class Customer(models.Model):
     datetime_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.user.first_name} {self.user.last_name}'
     
     class Meta:
         permissions = [
