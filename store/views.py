@@ -30,7 +30,7 @@ class ProductViewSet(ModelViewSet):
     # filterset_fields = ['category_id']
     pagination_class = DefaultPagination
     filterset_class = ProductFilter
-    permission_classes = [CustomDjangoModelPermission]
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Product.objects.all()
 
     # def get_queryset(self): #get category ID from URL (http://127.0.0.1:8000/store/products/?category_id=2)

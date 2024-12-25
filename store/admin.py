@@ -32,7 +32,7 @@ class InventoryFilter(admin.SimpleListFilter):
 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'inventory', 'unit_price', 'inventory_status', 'product_categgory', 'num_of_comments']
+    list_display = ['id', 'name', 'inventory', 'unit_price', 'inventory_status', 'product_category', 'num_of_comments']
     list_per_page = 50
     list_editable = ['unit_price' ]
     list_select_related = ['category']
@@ -58,7 +58,7 @@ class ProductAdmin(admin.ModelAdmin):
         return 'Medium'
     
     @admin.display(ordering='category__title')
-    def product_categgory(self, product: models.Product):
+    def product_category(self, product: models.Product):
         return product.category.title
     
     @admin.display(description='# comments', ordering='comments_count')
@@ -156,3 +156,14 @@ class CartItemInline(admin.TabularInline): #or StackedInline
 class CartAdmin(admin.ModelAdmin):
     list_display = ['id', 'created_at']
     inlines = [CartItemInline]
+
+@admin.register(models.Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ['discount', 'description']
+    search_fields = ['description']
+
+@admin.register(models.Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ['customer', 'state', 'city', 'street', 'number']
+    search_fields = [ 'state', 'city', 'street']
+    list_filter = ['state', 'city']
