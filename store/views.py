@@ -8,8 +8,8 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated 
-from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated, DjangoModelPermissions
+from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission, CustomDjangoModelPermission
 
 from .paginations import DefaultPagination
 from .models import Cart, CartItem, Category, Customer, Product, Comment
@@ -30,6 +30,7 @@ class ProductViewSet(ModelViewSet):
     # filterset_fields = ['category_id']
     pagination_class = DefaultPagination
     filterset_class = ProductFilter
+    permission_classes = [CustomDjangoModelPermission]
     queryset = Product.objects.all()
 
     # def get_queryset(self): #get category ID from URL (http://127.0.0.1:8000/store/products/?category_id=2)
