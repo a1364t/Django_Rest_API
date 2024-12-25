@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
-from rest_framework.decorators import api_view
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -10,8 +10,8 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 
 from .paginations import DefaultPagination
-from .models import Cart, CartItem, Category, Product, Comment
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, ProductSerializer, UpdateCartItemSerializer
+from .models import Cart, CartItem, Category, Customer, Product, Comment
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, CustomerSerializer, ProductSerializer, UpdateCartItemSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
@@ -96,6 +96,23 @@ class CartViewSet(CreateModelMixin, # Remoce List, Update
      serializer_class = CartSerializer
      queryset = Cart.objects.prefetch_related('items__product').all()
 
+
+class CustomerViewSet(ModelViewSet):
+    serializer_class = CustomerSerializer
+    queryset = Customer.objects.all()
+
+    @action(detail=False, methods=['GET', 'PUT']) # No ID is needed
+    def me(self, request):
+        user_id = request.user.id
+        customer = Customer.objects.get(user_id=user_id)
+        if request.method == 'GET':      
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
 ##################### Calss based View ###################################
 # class ProductList(ListCreateAPIView):
