@@ -8,6 +8,8 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated 
+from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
 
 from .paginations import DefaultPagination
 from .models import Cart, CartItem, Category, Customer, Product, Comment
@@ -53,6 +55,8 @@ class ProductViewSet(ModelViewSet):
 class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.prefetch_related('products').all()
+    permission_classes = [IsAdminOrReadOnly]
+    
 
     def destroy(self, request, pk):
         category = get_object_or_404(Category.objects.prefetch_related('products'), pk=pk)
@@ -100,8 +104,9 @@ class CartViewSet(CreateModelMixin, # Remoce List, Update
 class CustomerViewSet(ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
+    permission_classes = [IsAdminUser]
 
-    @action(detail=False, methods=['GET', 'PUT']) # No ID is needed
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes = [IsAuthenticated]) # No ID is needed
     def me(self, request):
         user_id = request.user.id
         customer = Customer.objects.get(user_id=user_id)
@@ -113,6 +118,10 @@ class CustomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+    @action(detail=True, permission_classes=[SendPrivateEmailToCustomerPermission]) # Detail=True => ID is needed
+    def send_private_email(self, request, pk):
+        return Response(f'Sending email to cusstomer {pk=}')
 
 ##################### Calss based View ###################################
 # class ProductList(ListCreateAPIView):
