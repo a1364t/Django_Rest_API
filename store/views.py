@@ -12,12 +12,13 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated, D
 from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission, CustomDjangoModelPermission
 
 from .paginations import DefaultPagination
-from .models import Cart, CartItem, Category, Customer, Product, Comment
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, CustomerSerializer, ProductSerializer, UpdateCartItemSerializer
+from .models import Cart, CartItem, Category, Customer, Order, OrderItem, Product, Comment
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, CustomerSerializer, OrderForAdminSerializer, OrderSerializer, ProductSerializer, UpdateCartItemSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from .filters import ProductFilter
+from django.db.models import Prefetch
 
 
 
@@ -123,6 +124,30 @@ class CustomerViewSet(ModelViewSet):
     @action(detail=True, permission_classes=[SendPrivateEmailToCustomerPermission]) # Detail=True => ID is needed
     def send_private_email(self, request, pk):
         return Response(f'Sending email to cusstomer {pk=}')
+    
+
+class OrderViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self): # Define basename in urls is neceessary
+        queryset= Order.objects.prefetch_related(
+            Prefetch(
+                    'items',
+                    queryset=OrderItem.objects.select_related('product'),
+                )
+        ).select_related('customer__user').all()
+        
+        user = self.request.user
+
+        if user.is_staff:
+            return queryset
+        return queryset.filter(customer__user_id=user.id)
+    
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return OrderForAdminSerializer
+        return OrderSerializer
+
 
 ##################### Calss based View ###################################
 # class ProductList(ListCreateAPIView):

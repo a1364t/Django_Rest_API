@@ -128,6 +128,9 @@ class Address(models.Model):
     street = models.CharField(max_length=255)
     number = models.PositiveIntegerField()
 
+    def __str__(self):
+        return f'{self.state}, {self.city}, {self.street}, {self.number}'
+
 
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4)
