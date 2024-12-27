@@ -19,6 +19,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from .filters import ProductFilter
 from django.db.models import Prefetch
+from .signals import order_created
 
 
 
@@ -168,6 +169,8 @@ class OrderViewSet(ModelViewSet):
         )
         create_order_serializer.is_valid(raise_exception=True)
         created_order = create_order_serializer.save()
+
+        order_created.send_robust(self.__class__, order=created_order)
 
         serializer = OrderSerializer(created_order)
         return Response(serializer.data)
