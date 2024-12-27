@@ -13,7 +13,7 @@ from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
 
 from .paginations import DefaultPagination
 from .models import Cart, CartItem, Category, Customer, Order, OrderItem, Product, Comment
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, CustomerSerializer, OrderForAdminSerializer, OrderSerializer, ProductSerializer, UpdateCartItemSerializer
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, CustomerSerializer, OrderCreateSerializer, OrderForAdminSerializer, OrderSerializer, OrderUpdateSerializer, ProductSerializer, UpdateCartItemSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
@@ -127,7 +127,13 @@ class CustomerViewSet(ModelViewSet):
     
 
 class OrderViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'patch', 'delete', 'options', 'head']
+    # permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
     
     def get_queryset(self): # Define basename in urls is neceessary
         queryset= Order.objects.prefetch_related(
@@ -144,10 +150,27 @@ class OrderViewSet(ModelViewSet):
         return queryset.filter(customer__user_id=user.id)
     
     def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return OrderCreateSerializer
+        if self.request.method == 'PATCH': # Admin can only update order status
+            return OrderUpdateSerializer
         if self.request.user.is_staff:
             return OrderForAdminSerializer
         return OrderSerializer
+    
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
+    
+    def create(self, request, *args, **kwargs): #overide create methos to show OrderItems in response
+        create_order_serializer = OrderCreateSerializer(
+            data=request.data, 
+            context={'user_id': self.request.user.id}
+        )
+        create_order_serializer.is_valid(raise_exception=True)
+        created_order = create_order_serializer.save()
 
+        serializer = OrderSerializer(created_order)
+        return Response(serializer.data)
 
 ##################### Calss based View ###################################
 # class ProductList(ListCreateAPIView):
