@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store API</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Store API</h1>
+        <p>This is a backend API for managing a store, featuring the following models:</p>
+        <ul>
+            <li><strong>Comment:</strong> Represents product comments.</li>
+            <li><strong>Category:</strong> Represents product categories.</li>
+            <li><strong>Discount:</strong> Represents product discounts.</li>
+            <li><strong>Product:</strong> Represents store products.</li>
+            <li><strong>Customer:</strong> Represents customers registered in the system.</li>
+            <li><strong>OrderItem, Order:</strong> Represents customer orders with nested items.</li>
+            <li><strong>CartItem, Cart:</strong> Allows anonymous cart creation using UUIDs.</li>
+        </ul>
+
+        <img src="{% static 'images/db_design.jpg' %}" alt="Database Design" width="600">
+        
+        <h2>Key Features</h2>
+        <p>The main features of the API include:</p>
+        <ol>
+            <li>Admin and Test User accounts for testing. Use the following credentials:
+                <ul>
+                    <li>Admin: <code>admin</code> / <code>password</code></li>
+                    <li>Test User: <code>test</code> / <code>password</code></li>
+                </ul>
+            </li>
+            <li>Access to the admin panel for demonstration purposes.</li>
+            <ul><a href="/admin/" target="_blank">Go to Admin Panel</a></ul>
+            <li>Secure authentication via <strong>Djoser</strong> and <strong>JWT</strong>. <a href='/auth/users/' target="_blank">Sign in</a> to get:
+                <ul>
+                    <li><strong>Refresh Token:</strong> Expires in 1 day.</li>
+                    <li><strong>Access Token:</strong> Expires in 30 minutes.</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>Authentication</h3>
+        <p>To access the API, you need to authenticate using JWT tokens. Follow these steps:</p>
+        
+        <h4>1. Log In</h4>
+        <p>Use the following credentials to get tokens from this <a href='/auth/jwt/create/' target="_blank">link</a>:</p>
+        <ul>
+            <li>Admin: <code>admin</code> / <code>password</code></li>
+            <li>Test User: <code>test</code> / <code>password</code></li>
+        </ul>
+        <img src="{% static 'images/create.jpg' %}" alt="Create Token" width="600">
+        
+        <h4>2. Refresh Access Token</h4>
+        <p>When the access token expires (in 30 minutes), you can use the refresh token to obtain a new access token. Make a POST request to the following endpoint:</p>
+        <a href='/auth/jwt/refresh/' target="_blank">Refresh Token</a>
+        <br/>
+        <img src="{% static 'images/refresh.jpg' %}" alt="Refresh Token" width="600">
+        <p>You will receive a new access token in return.</p>
+        
+        <h4>3. Add Tokens to ModHeader</h4>
+        <p>Once you have your access token, you need to add it to your requests for authentication. You can use the <a href="https://modheader.com/" target="_blank">ModHeader</a> extension (available only for Chrome) or Postman. Here's how:</p>
+        <ul>
+            <li>In ModHeader, add the following header. (Note that the JWT token must begin with the word "Bearer" followed by a space). Both the Admin and Test User tokens can be added to test the functionality.
+                <br/>
+                <img src="{% static 'images/Modheader.jpg' %}" alt="Modheader" width="600">
+            </li>
+            <li>In Postman, go to the "Authorization" tab, select "Bearer Token" as the type, and paste the access token in the token field.</li>
+        </ul>
+        
+        <h4>4. Explore the Browsable API</h4>
+        <p>Once logged in and with the token added, you can explore the browsable API. You will have access to the following features:</p>
+        <ul>
+            <li>Admin Users can manage the store's products, categories, and orders.</li>
+            <li>Test Users can view products and create carts and orders.</li>
+        </ul>
+
+        <h4>5. Create a UUID for a Cart</h4>
+        <p>You can create a cart by sending a POST request to this <a href="/store/carts" target="_blank">link</a> (creating a cart ID is anonymous).</p>
+        <ul>
+            <li>Copy the cart ID and use this link to add items to the cart:</li>
+            <li>/store/carts/%UUID%/items</li>
+        </ul>
+
+        <ul>
+            <li>Submit the cart to place an order by sending a POST request with the cart ID (the cart will be deleted after this request):</li>
+            <li><a href="/store/orders" target="_blank">Link</a></li>
+        </ul>
+
+        <h3>Database</h3>
+        <p>Fake data is generated using <strong>Faker</strong> and <strong>Factory Boy</strong>.</p>
+        <p>Database queries were optimised with the <strong>Django Debug Toolbar</strong>, enabling detailed query analysis and reducing redundant or inefficient database calls.</p>
+    </div>
+</body>
+</html>
