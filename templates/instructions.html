@@ -10,6 +10,7 @@
 <body>
     <div class="container">
         <h1>Store API</h1>
+        <a href='/store/' target="_blank">API Root</a>
         <p>This is a backend API for managing a store, featuring the following models:</p>
         <ul>
             <li><strong>Comment:</strong> Represents product comments.</li>
@@ -21,15 +22,15 @@
             <li><strong>CartItem, Cart:</strong> Allows anonymous cart creation using UUIDs.</li>
         </ul>
 
-        <img src="{% static 'images/db_design.jpg' %}" alt="Database Design" width="600">
-        
+        <img src="{% static 'images/db_design.jpg' %}" alt="Database Design" class="responsive-image">
+
         <h2>Key Features</h2>
         <p>The main features of the API include:</p>
         <ol>
             <li>Admin and Test User accounts for testing. Use the following credentials:
                 <ul>
-                    <li>Admin: <code>admin</code> / <code>password</code></li>
-                    <li>Test User: <code>test</code> / <code>password</code></li>
+                    <li>Admin: <code>admin</code> Password: <code>password</code></li>
+                    <li>Test User: <code>user</code> Password: <code>password</code></li>
                 </ul>
             </li>
             <li>Access to the admin panel for demonstration purposes.</li>
@@ -41,35 +42,35 @@
                 </ul>
             </li>
         </ol>
-        
+
         <h3>Authentication</h3>
         <p>To access the API, you need to authenticate using JWT tokens. Follow these steps:</p>
-        
+
         <h4>1. Log In</h4>
         <p>Use the following credentials to get tokens from this <a href='/auth/jwt/create/' target="_blank">link</a>:</p>
         <ul>
             <li>Admin: <code>admin</code> / <code>password</code></li>
-            <li>Test User: <code>test</code> / <code>password</code></li>
+            <li>Test User: <code>user</code> / <code>password</code></li>
         </ul>
-        <img src="{% static 'images/create.jpg' %}" alt="Create Token" width="600">
-        
+        <img src="{% static 'images/create.jpg' %}" alt="Create Token" class="responsive-image">
+
         <h4>2. Refresh Access Token</h4>
         <p>When the access token expires (in 30 minutes), you can use the refresh token to obtain a new access token. Make a POST request to the following endpoint:</p>
         <a href='/auth/jwt/refresh/' target="_blank">Refresh Token</a>
         <br/>
-        <img src="{% static 'images/refresh.jpg' %}" alt="Refresh Token" width="600">
+        <img src="{% static 'images/refresh.jpg' %}" alt="Refresh Token" class="responsive-image">
         <p>You will receive a new access token in return.</p>
-        
+
         <h4>3. Add Tokens to ModHeader</h4>
         <p>Once you have your access token, you need to add it to your requests for authentication. You can use the <a href="https://modheader.com/" target="_blank">ModHeader</a> extension (available only for Chrome) or Postman. Here's how:</p>
         <ul>
             <li>In ModHeader, add the following header. (Note that the JWT token must begin with the word "Bearer" followed by a space). Both the Admin and Test User tokens can be added to test the functionality.
                 <br/>
-                <img src="{% static 'images/Modheader.jpg' %}" alt="Modheader" width="600">
+                <img src="{% static 'images/Modheader.jpg' %}" alt="Modheader" class="responsive-image">
             </li>
             <li>In Postman, go to the "Authorization" tab, select "Bearer Token" as the type, and paste the access token in the token field.</li>
         </ul>
-        
+
         <h4>4. Explore the Browsable API</h4>
         <p>Once logged in and with the token added, you can explore the browsable API. You will have access to the following features:</p>
         <ul>
@@ -93,5 +94,8 @@
         <p>Fake data is generated using <strong>Faker</strong> and <strong>Factory Boy</strong>.</p>
         <p>Database queries were optimised with the <strong>Django Debug Toolbar</strong>, enabling detailed query analysis and reducing redundant or inefficient database calls.</p>
     </div>
+    <footer>
+        <p>&copy; 2025 Alireza Talaei | v2.0</p>
+    </footer>
 </body>
 </html>
