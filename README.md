@@ -28,7 +28,7 @@ The API includes the following models:
 
 - **Admin Panel Access:**  
   - Explore the admin panel to manage products, categories, and orders.  
-  - [Go to Admin Panel](/admin/)  
+  - [Go to Admin Panel](https://a195.pythonanywhere.com/admin/)  
 
 - **Secure Authentication:**  
   - Authentication is handled via Djoser and JWT.  
@@ -51,12 +51,12 @@ Use the provided credentials to log in and generate tokens:
 - **Admin:** `admin` / `password`  
 - **Test User:** `user` / `password`  
 
-[Create Token](/auth/jwt/create/)  
+[Create Token](https://a195.pythonanywhere.com/auth/jwt/create/)  
 
 ### **2. Refresh Access Token**  
 When your access token expires (in 30 minutes), refresh it by making a POST request to the following endpoint:  
 
-[Refresh Token](/auth/jwt/refresh/)  
+[Refresh Token](https://a195.pythonanywhere.com/auth/jwt/refresh/)  
 
 You will receive a new access token in return.  
 
